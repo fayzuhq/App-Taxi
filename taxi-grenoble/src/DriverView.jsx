@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Play, Square, AlertTriangle, Phone, MessageSquare, MapPin, CheckCircle,
-  Plus, Menu, Clock, Euro, Navigation, FileText, Camera, X
+  Plus, Menu, Clock, Navigation, FileText, Camera, X, Ban, Receipt, Upload
 } from 'lucide-react';
 import { mockRides, mockDrivers } from './mockData';
 
@@ -12,6 +12,11 @@ const DriverView = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showSosModal, setShowSosModal] = useState(false);
   const [showShiftModal, setShowShiftModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [showEndRideModal, setShowEndRideModal] = useState(false);
+
+  const [addRideStatus, setAddRideStatus] = useState('en_cours');
 
   const driver = mockDrivers[0]; // Active driver
 
@@ -132,8 +137,14 @@ const DriverView = () => {
                     <span className="text-[10px] font-bold">Waze / Maps</span>
                   </button>
                 </div>
+                <div className="mt-2">
+                  <button onClick={() => setShowCancelModal(true)} className="w-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-red-100 dark:hover:bg-red-900/40">
+                    <Ban className="w-4 h-4" />
+                    <span className="text-sm">Annuler la course</span>
+                  </button>
+                </div>
               </div>
-              <button className="w-full bg-gray-900 dark:bg-gray-700 text-white font-bold py-3 hover:bg-gray-800 flex items-center justify-center space-x-2">
+              <button onClick={() => setShowEndRideModal(true)} className="w-full bg-gray-900 dark:bg-gray-700 text-white font-bold py-3 hover:bg-gray-800 flex items-center justify-center space-x-2">
                 <CheckCircle className="w-5 h-5" />
                 <span>Terminer la course</span>
               </button>
@@ -156,10 +167,14 @@ const DriverView = () => {
                     <span className="text-xs font-medium bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">{ride.id}</span>
                   </div>
                   <h4 className="font-bold text-sm mb-1">{ride.clientName}</h4>
-                  <div className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                  <div className="text-xs text-gray-600 dark:text-gray-400 truncate mb-2">
                     De: {ride.pickup} <br/>
                     À: {ride.dropoff}
                   </div>
+                  <button onClick={() => setShowCancelModal(true)} className="w-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold py-1.5 rounded flex items-center justify-center space-x-1 hover:bg-red-100 dark:hover:bg-red-900/40">
+                    <Ban className="w-3.5 h-3.5" />
+                    <span className="text-xs">Annuler</span>
+                  </button>
                 </div>
               ))}
             </div>
@@ -189,14 +204,24 @@ const DriverView = () => {
 
       </div>
 
-      {/* FAB */}
+      {/* FABs */}
       {!driveMode && (
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="fixed bottom-6 right-6 lg:absolute lg:bottom-6 lg:right-6 bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center z-20 transition-transform active:scale-95"
-        >
-          <Plus className="w-6 h-6" />
-        </button>
+        <div className="fixed bottom-6 right-6 lg:absolute lg:bottom-6 lg:right-6 flex flex-col space-y-3 z-20">
+          <button
+            onClick={() => setShowExpenseModal(true)}
+            className="bg-orange-500 hover:bg-orange-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-transform active:scale-95 mx-auto"
+            title="Saisir une dépense"
+          >
+            <Receipt className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-transform active:scale-95"
+            title="Nouvelle Course"
+          >
+            <Plus className="w-6 h-6" />
+          </button>
+        </div>
       )}
 
       {/* Modals & Overlays */}
@@ -211,17 +236,46 @@ const DriverView = () => {
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-6">
               <div>
-                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Statut File d'attente</h3>
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Page Principale</h3>
                 <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
                   <div className="flex justify-between items-center">
-                    <span className="font-medium">Gare de Grenoble</span>
+                    <span className="font-medium">File: Gare de Grenoble</span>
                     <span className="bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full">#2</span>
                   </div>
                 </div>
               </div>
               <div>
-                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Documents & Conformité</h3>
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Historiques et Comptes Rendus</h3>
                 <div className="space-y-2">
+                  <details className="group bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <summary className="flex justify-between items-center font-medium cursor-pointer list-none p-3">
+                      <span>Août 2024</span>
+                      <span className="transition group-open:rotate-180">
+                        <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                      </span>
+                    </summary>
+                    <div className="text-sm px-3 pb-3">
+                      <details className="group/day">
+                        <summary className="flex justify-between items-center cursor-pointer list-none p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+                          <span>26 Août</span>
+                          <span>245.50€</span>
+                        </summary>
+                        <div className="pl-4 pr-2 py-2 text-xs space-y-2 border-l-2 border-gray-200 dark:border-gray-700 ml-2">
+                          <div className="flex justify-between text-gray-600 dark:text-gray-400"><span>10:30 Course CB</span><span>25.50€</span></div>
+                          <div className="flex justify-between text-gray-600 dark:text-gray-400"><span>11:15 Dépense (Gasoil)</span><span className="text-red-500">-40.00€</span></div>
+                          <button className="mt-2 w-full flex items-center justify-center space-x-1 py-1.5 text-blue-600 bg-blue-50 dark:bg-blue-900/30 rounded">
+                            <FileText className="w-4 h-4" />
+                            <span>Exporter compte rendu PDF</span>
+                          </button>
+                        </div>
+                      </details>
+                    </div>
+                  </details>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Documents & Conformité</h3>
+                <div className="space-y-2 mb-3">
                   <div className="flex justify-between items-center text-sm p-2 bg-gray-50 dark:bg-gray-800 rounded">
                     <span>Carte Pro</span>
                     <span className={`text-xs font-bold px-2 py-1 rounded ${driver.docsExpiry.proCard < 30 ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'}`}>{driver.docsExpiry.proCard} j</span>
@@ -230,14 +284,17 @@ const DriverView = () => {
                     <span>Taximètre</span>
                     <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded">{driver.docsExpiry.taximeter} j</span>
                   </div>
+                  <div className="flex justify-between items-center text-sm p-2 bg-gray-50 dark:bg-gray-800 rounded">
+                    <span>Assurance</span>
+                    <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded">{driver.docsExpiry.insurance} j</span>
+                  </div>
                 </div>
+                <button className="w-full flex items-center justify-center space-x-2 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300">
+                  <Upload className="w-4 h-4" />
+                  <span>Envoyer mise à jour / Scan</span>
+                </button>
+                <p className="text-[10px] text-center text-orange-500 mt-1">En attente de validation par la direction</p>
               </div>
-            </div>
-            <div className="p-4 border-t dark:border-gray-700">
-              <button className="w-full flex items-center justify-center space-x-2 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
-                <FileText className="w-5 h-5" />
-                <span>Rapport PDF</span>
-              </button>
             </div>
           </div>
           <div className="flex-1 bg-black/50" onClick={() => setSidebarOpen(false)}></div>
@@ -310,18 +367,57 @@ const DriverView = () => {
       {showAddModal && (
         <div className="absolute inset-0 z-50 flex flex-col bg-white dark:bg-gray-900">
           <div className="p-4 border-b dark:border-gray-800 flex justify-between items-center">
-            <h2 className="text-xl font-bold">Nouvelle Course (Volante)</h2>
+            <h2 className="text-xl font-bold">Saisie Course</h2>
             <button onClick={() => setShowAddModal(false)} className="p-2 bg-gray-100 dark:bg-gray-800 rounded-full"><X className="w-5 h-5"/></button>
           </div>
           <div className="p-4 flex-1 overflow-y-auto space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Client (Optionnel)</label>
+              <label className="block text-sm font-medium mb-1">Statut de la course</label>
+              <select value={addRideStatus} onChange={(e) => setAddRideStatus(e.target.value)} className="w-full border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-lg p-3 font-medium">
+                <option value="reservation">Réservation (À venir)</option>
+                <option value="en_cours">En cours (Volante)</option>
+                <option value="terminee">Terminée (Historique)</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Client (Nom complet)</label>
               <input type="text" placeholder="Nom du client" className="w-full border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-lg p-3" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Destination</label>
-              <input type="text" placeholder="Adresse" className="w-full border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-lg p-3" />
+              <label className="block text-sm font-medium mb-1">Téléphone</label>
+              <input type="tel" placeholder="06..." className="w-full border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-lg p-3" />
             </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Date & Heure</label>
+              <input type="datetime-local" className="w-full border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-lg p-3" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Départ</label>
+              <input type="text" placeholder="Adresse de départ" className="w-full border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-lg p-3" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Destination</label>
+              <input type="text" placeholder="Adresse d'arrivée" className="w-full border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-lg p-3" />
+            </div>
+
+            {addRideStatus === 'terminee' && (
+              <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border dark:border-gray-700 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Montant final (€)</label>
+                  <input type="number" placeholder="0.00" className="w-full border dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg p-3 text-xl font-bold" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Moyen de paiement</label>
+                  <select className="w-full border dark:border-gray-600 bg-white dark:bg-gray-700 rounded-lg p-3">
+                    <option>CB</option>
+                    <option>Espèces</option>
+                    <option>Facture (B2B)</option>
+                    <option>CPAM</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center space-x-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border dark:border-gray-700">
               <input type="checkbox" id="cpam" className="w-5 h-5 rounded border-gray-300 text-blue-600" />
               <label htmlFor="cpam" className="font-medium flex-1">Transport Médical (CPAM)</label>
@@ -330,7 +426,109 @@ const DriverView = () => {
           </div>
           <div className="p-4 border-t dark:border-gray-800">
             <button className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl" onClick={() => setShowAddModal(false)}>
-              Démarrer la course
+              Enregistrer
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Ride Modal */}
+      {showCancelModal && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm p-6">
+            <h2 className="text-xl font-bold mb-4 text-red-600 flex items-center space-x-2">
+              <Ban className="w-6 h-6" />
+              <span>Annuler la course</span>
+            </h2>
+            <div className="mb-6 space-y-3">
+              <label className="block text-sm font-medium">Motif d'annulation :</label>
+              <select className="w-full border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                <option>Client absent (No-show)</option>
+                <option>Panne / Problème technique</option>
+                <option>Bouchons / Retard trop important</option>
+                <option>Autre (préciser en note)</option>
+              </select>
+            </div>
+            <div className="flex space-x-3">
+              <button className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-bold py-3 rounded-xl" onClick={() => setShowCancelModal(false)}>
+                Retour
+              </button>
+              <button className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl" onClick={() => setShowCancelModal(false)}>
+                Confirmer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Expense Modal */}
+      {showExpenseModal && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm p-6">
+            <h2 className="text-xl font-bold mb-4 flex items-center space-x-2">
+              <Receipt className="w-6 h-6 text-orange-500" />
+              <span>Saisir une dépense</span>
+            </h2>
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium mb-1">Type de dépense</label>
+                <select className="w-full border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+                  <option>Carburant (Gasoil/Essence)</option>
+                  <option>Péage</option>
+                  <option>Lavage</option>
+                  <option>Entretien / Garage</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Montant (€)</label>
+                <input type="number" placeholder="0.00" className="w-full border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-lg" />
+              </div>
+              <button className="w-full flex items-center justify-center space-x-2 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800">
+                <Camera className="w-5 h-5" />
+                <span>Scanner le justificatif</span>
+              </button>
+            </div>
+            <div className="flex space-x-3">
+              <button className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white font-bold py-3 rounded-xl" onClick={() => setShowExpenseModal(false)}>
+                Annuler
+              </button>
+              <button className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl" onClick={() => setShowExpenseModal(false)}>
+                Enregistrer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* End Ride Modal */}
+      {showEndRideModal && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm p-6 border-t-8 border-green-500">
+            <h2 className="text-xl font-bold mb-1">Fin de course</h2>
+            <p className="text-sm text-gray-500 mb-6">Veuillez saisir le montant et le mode de paiement.</p>
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium mb-1 text-center">Montant affiché au taximètre</label>
+                <div className="relative">
+                  <input type="number" placeholder="0.00" className="w-full border-2 border-green-500 dark:border-green-600 bg-green-50 dark:bg-green-900/20 rounded-xl p-4 text-3xl font-bold text-center text-green-700 dark:text-green-400" />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-green-600">€</span>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Mode de paiement</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold py-3 rounded-lg border border-blue-200 dark:border-blue-800">CB</button>
+                  <button className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold py-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-200">Espèces</button>
+                  <button className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold py-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-200">Facture</button>
+                  <button className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold py-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-200">CPAM</button>
+                </div>
+              </div>
+            </div>
+
+            <button className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl text-lg shadow-lg flex items-center justify-center space-x-2" onClick={() => setShowEndRideModal(false)}>
+              <CheckCircle className="w-6 h-6" />
+              <span>Valider le paiement</span>
             </button>
           </div>
         </div>

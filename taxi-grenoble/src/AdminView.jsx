@@ -28,19 +28,19 @@ const AdminView = () => {
       </div>
 
       {/* KPIs Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center space-x-4">
           <div className="p-3 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-lg"><Euro className="w-6 h-6"/></div>
           <div>
-            <p className="text-sm text-gray-500 font-medium">CA Total (Est.)</p>
-            <p className="text-2xl font-bold">{mockKpis.totalRevenue} €</p>
+            <p className="text-[10px] sm:text-xs text-gray-500 font-medium leading-tight mb-1">Total des redevances et cotisations perçues</p>
+            <p className="text-xl sm:text-2xl font-bold">{mockKpis.totalRoyalties} €</p>
           </div>
         </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center space-x-4">
-          <div className="p-3 bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 rounded-lg"><TrendingUp className="w-6 h-6"/></div>
+          <div className="p-3 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-lg"><TrendingUp className="w-6 h-6"/></div>
           <div>
-            <p className="text-sm text-gray-500 font-medium">Taux Conversion</p>
-            <p className="text-2xl font-bold">{mockKpis.conversionRate}%</p>
+            <p className="text-[10px] sm:text-xs text-gray-500 font-medium leading-tight mb-1">Volume d'affaires global transitant par le groupement</p>
+            <p className="text-xl sm:text-2xl font-bold">{mockKpis.globalBusinessVolume} €</p>
           </div>
         </div>
         <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center space-x-4">
