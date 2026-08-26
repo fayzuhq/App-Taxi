@@ -97,7 +97,8 @@ export const mockDrivers = [
 ];
 
 export const mockKpis = {
-  totalRevenue: 4580.00,
+  totalRoyalties: 1250.00,
+  globalBusinessVolume: 15480.00,
   conversionRate: 85,
   paymentBreakdown: [
     { name: 'CB', value: 2400 },
@@ -115,7 +116,7 @@ export const mockKpis = {
 };
 
 export const mockAuditLogs = [
-  { id: 1, time: '10:05', user: 'Admin', action: 'Généré carte pro D03' },
-  { id: 2, time: '09:30', user: 'Standard', action: 'Assignation manuelle T14 -> R1001' },
-  { id: 3, time: '08:15', user: 'Standard', action: 'Annulation course R0998 client no-show' }
+  { id: 1, time: '10:05', user: 'Admin - Marc V.', action: 'Généré carte pro D03' },
+  { id: 2, time: '09:30', user: 'Operateur #02 - Jean D.', action: 'Assignation manuelle T14 -> R1001' },
+  { id: 3, time: '08:15', user: 'Operateur #01 - Sophie L.', action: 'Annulation course R0998 client no-show' }
 ];
