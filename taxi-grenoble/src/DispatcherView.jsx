@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { mockRides, mockDrivers } from './mockData';
-import { MapPin, Phone, Car, Clock, User, X, Check, ChevronDown, ChevronUp, Edit, Trash2, MessageSquare } from 'lucide-react';
+import { MapPin, Phone, Car, Clock, User, X, Check, ChevronDown, ChevronUp, Edit, Trash2, MessageSquare, Zap } from 'lucide-react';
 
 const DispatcherView = () => {
   const [showDispatchModal, setShowDispatchModal] = useState(false);
@@ -117,6 +117,23 @@ const DispatcherView = () => {
                                     <Car className="w-3 h-3"/>
                                     <span>Assigner</span>
                                   </button>
+                                  {ride.status === 'en_attente' && (
+                                    <button
+                                      className="flex-1 py-1.5 bg-purple-100 dark:bg-purple-900/30 hover:bg-purple-200 dark:hover:bg-purple-900/50 rounded text-xs font-bold text-purple-700 dark:text-purple-300 flex items-center justify-center space-x-1"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        const availableDrivers = mockDrivers.filter(d => d.status === 'available');
+                                        if (availableDrivers.length > 0) {
+                                          alert(`Intelligent Assign: Ride ${ride.id} assigned to ${availableDrivers[0].name} (${availableDrivers[0].carModel}) based on proximity.`);
+                                        } else {
+                                          alert(`Intelligent Assign: No available drivers found for Ride ${ride.id}.`);
+                                        }
+                                      }}
+                                    >
+                                      <Zap className="w-3 h-3"/>
+                                      <span>Intelligent Assign</span>
+                                    </button>
+                                  )}
                                 </div>
                               )}
 

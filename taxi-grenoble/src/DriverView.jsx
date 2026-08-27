@@ -137,7 +137,11 @@ const DriverView = () => {
                     <span className="text-[10px] font-bold">Waze / Maps</span>
                   </button>
                 </div>
-                <div className="mt-2">
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  <button onClick={() => alert(`SMS envoyé : Votre taxi est là (Modèle : ${driver.carModel})`)} className="w-full bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 font-bold py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-green-100 dark:hover:bg-green-900/40">
+                    <MessageSquare className="w-4 h-4" />
+                    <span className="text-sm">Notify Client (Approche)</span>
+                  </button>
                   <button onClick={() => setShowCancelModal(true)} className="w-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold py-2 rounded-lg flex items-center justify-center space-x-2 hover:bg-red-100 dark:hover:bg-red-900/40">
                     <Ban className="w-4 h-4" />
                     <span className="text-sm">Annuler la course</span>

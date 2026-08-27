@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Activity, Server, Globe, Settings, Users, Key, FileJson, Play, TerminalSquare, X, Plus, Save, KeyRound, Map, ShieldCheck, CreditCard, AlertTriangle, Download, Zap
+  Activity, Server, Globe, Settings, Users, Key, FileJson, Play, TerminalSquare, X, Plus, Save, KeyRound, Map, ShieldCheck, CreditCard, AlertTriangle, Download, Zap, Eye
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer
@@ -135,7 +135,7 @@ const SuperAdminDashboard = ({ setRole }) => {
                     Reset
                   </button>
                   <button onClick={() => setRole(user.role)} className="px-3 py-1.5 text-xs font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 rounded flex-inline items-center space-x-1">
-                    <Play className="w-3 h-3 inline mr-1" />
+                    <Eye className="w-3 h-3 inline mr-1" />
                     Impersonate
                   </button>
                 </td>
