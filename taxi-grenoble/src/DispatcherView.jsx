@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { mockRides, mockDrivers } from './mockData';
-import { MapPin, Phone, Car, Clock, User, X, Check, ChevronDown, ChevronUp, Edit, Trash2, MessageSquare, Plus } from 'lucide-react';
+import { MapPin, Phone, Car, Clock, User, X, Check, ChevronDown, ChevronUp, Edit, Trash2, MessageSquare } from 'lucide-react';
 
 const DispatcherView = () => {
   const [showDispatchModal, setShowDispatchModal] = useState(false);

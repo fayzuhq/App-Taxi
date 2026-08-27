@@ -4,9 +4,10 @@ import DriverView from './DriverView';
 import DispatcherView from './DispatcherView';
 import AdminView from './AdminView';
 import Login from './components/Login';
+import SuperAdminDashboard from './components/SuperAdminDashboard';
 
 function App() {
-  const [role, setRole] = useState(null); // 'driver', 'dispatcher', 'admin'
+  const [role, setRole] = useState(null); // 'driver', 'dispatcher', 'admin', 'superadmin'
   const [darkMode, setDarkMode] = useState(false);
 
   const toggleDarkMode = () => {
@@ -63,6 +64,7 @@ function App() {
         {role === 'driver' && <DriverView />}
         {role === 'dispatcher' && <DispatcherView />}
         {role === 'admin' && <AdminView />}
+        {role === 'superadmin' && <SuperAdminDashboard setRole={setRole} />}
       </main>
 
     </div>
