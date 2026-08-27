@@ -9,7 +9,8 @@ const Login = ({ onLogin }) => {
     e.preventDefault();
     let role = 'driver';
     const lowerUser = username.toLowerCase();
-    if (lowerUser.includes('admin')) role = 'admin';
+    if (lowerUser.includes('superadmin') || lowerUser.includes('dev')) role = 'superadmin';
+    else if (lowerUser.includes('admin')) role = 'admin';
     else if (lowerUser.includes('disp') || lowerUser.includes('standard')) role = 'dispatcher';
     onLogin(role);
   };
@@ -73,7 +74,20 @@ const Login = ({ onLogin }) => {
             </button>
 
             <div className="text-xs text-center text-gray-500 dark:text-gray-400 mt-4">
-              Astuce : tapez "admin", "disp" ou n'importe quoi d'autre pour "driver".
+              Astuce : tapez "admin", "disp", "dev" (Super Admin) ou n'importe quoi d'autre pour "driver".
+            </div>
+
+            <div className="mt-4 pt-4 border-t dark:border-gray-700 flex justify-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername('dev_root');
+                  setPassword('password');
+                }}
+                className="text-xs text-purple-600 dark:text-purple-400 hover:underline font-medium"
+              >
+                Accès rapide : Super Admin / Lead Dev
+              </button>
             </div>
           </form>
         </div>
