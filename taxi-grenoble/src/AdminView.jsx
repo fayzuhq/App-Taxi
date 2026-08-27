@@ -1,5 +1,5 @@
 import React from 'react';
-import { mockKpis, mockDrivers, mockAuditLogs } from './mockData';
+import { mockKpis, mockDrivers, mockAuditLogs, mockRawAuditLogs } from './mockData';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
@@ -151,18 +151,54 @@ const AdminView = () => {
             <h3 className="font-bold flex items-center space-x-2"><AlertCircle className="w-5 h-5 text-orange-500"/> <span>Journal d'Audit</span></h3>
           </div>
           <div className="p-4 flex-1 overflow-y-auto space-y-4">
-            {mockAuditLogs.map(log => (
+            {mockRawAuditLogs.map(log => (
               <div key={log.id} className="flex items-start space-x-3 text-sm">
-                <div className="mt-0.5 text-gray-400 font-mono text-xs">{log.time}</div>
+                <div className="mt-0.5 text-gray-400 font-mono text-xs">{new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                 <div>
-                  <span className="font-bold text-gray-700 dark:text-gray-300 mr-2">{log.user}:</span>
-                  <span className="text-gray-600 dark:text-gray-400">{log.action}</span>
+                  <span className="font-bold text-gray-700 dark:text-gray-300 mr-2">{log.service}:</span>
+                  <span className="text-gray-600 dark:text-gray-400">{log.message}</span>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
+      </div>
+
+      <div className="mt-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
+          <h3 className="font-bold flex items-center space-x-2"><Euro className="w-5 h-5 text-green-500"/> <span>Suivi des Cotisations</span></h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-gray-50 dark:bg-gray-900/50 text-gray-500 font-medium border-b dark:border-gray-700">
+              <tr>
+                <th className="px-4 py-3">Chauffeur</th>
+                <th className="px-4 py-3">ID Taxi</th>
+                <th className="px-4 py-3">Montant Cotisation</th>
+                <th className="px-4 py-3">Statut du paiement</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y dark:divide-gray-700">
+              {mockDrivers.map(driver => (
+                <tr key={driver.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                  <td className="px-4 py-3 font-medium">{driver.name}</td>
+                  <td className="px-4 py-3 text-gray-500">{driver.taxiId}</td>
+                  <td className="px-4 py-3 font-bold">{driver.dues?.amount || 0} €</td>
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                      driver.dues?.status === 'Paid' ? 'bg-green-100 text-green-700' :
+                      driver.dues?.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-red-100 text-red-700'
+                    }`}>
+                      {driver.dues?.status || 'Inconnu'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
     </div>

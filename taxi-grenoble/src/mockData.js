@@ -72,17 +72,19 @@ export const mockDrivers = [
     status: 'active',
     ridesToday: 8,
     revenueToday: 245.50,
-    docsExpiry: { proCard: 15, taximeter: 45, insurance: 120 }
+    docsExpiry: { proCard: 15, taximeter: 45, insurance: 120 },
+    dues: { status: 'Paid', amount: 150 }
   },
   {
     id: 'D02',
     taxiId: 'T02',
     name: 'Laurent',
     carModel: 'Peugeot 508',
-    status: 'active',
+    status: 'available',
     ridesToday: 6,
     revenueToday: 180.00,
-    docsExpiry: { proCard: 200, taximeter: 10, insurance: 300 }
+    docsExpiry: { proCard: 200, taximeter: 10, insurance: 300 },
+    dues: { status: 'Pending', amount: 150 }
   },
   {
     id: 'D03',
@@ -92,7 +94,19 @@ export const mockDrivers = [
     status: 'inactive',
     ridesToday: 0,
     revenueToday: 0,
-    docsExpiry: { proCard: 5, taximeter: 90, insurance: 30 }
+    docsExpiry: { proCard: 5, taximeter: 90, insurance: 30 },
+    dues: { status: 'Overdue', amount: 150 }
+  },
+  {
+    id: 'D04',
+    taxiId: 'T22',
+    name: 'Paul',
+    carModel: 'Renault Talisman',
+    status: 'available',
+    ridesToday: 2,
+    revenueToday: 45.00,
+    docsExpiry: { proCard: 100, taximeter: 200, insurance: 50 },
+    dues: { status: 'Paid', amount: 150 }
   }
 ];
 
