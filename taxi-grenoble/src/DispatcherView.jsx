@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
 import { mockRides, mockDrivers } from './mockData';
-import { MapPin, Phone, Car, Clock, User, X, Check } from 'lucide-react';
+import { MapPin, Phone, Car, Clock, User, X, Check, ChevronDown, ChevronUp, Edit, Trash2, MessageSquare, Plus } from 'lucide-react';
 
 const DispatcherView = () => {
   const [showDispatchModal, setShowDispatchModal] = useState(false);
   const [selectedRide, setSelectedRide] = useState(null);
 
   const [mapExpanded, setMapExpanded] = useState(false);
+  const [collapsedColumns, setCollapsedColumns] = useState({});
+
+  const toggleColumn = (id, e) => {
+    e.stopPropagation();
+    setCollapsedColumns(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
 
   const columns = [
     { id: 'en_attente', title: 'En attente', bgColor: 'bg-red-50 dark:bg-red-900/20', borderColor: 'border-red-200 dark:border-red-800', textColor: 'text-red-800 dark:text-red-200' },
@@ -19,9 +28,9 @@ const DispatcherView = () => {
   const getDriver = (taxiId) => mockDrivers.find(d => d.taxiId === taxiId);
 
   return (
-    <div className="p-4 md:p-6 max-w-[1600px] mx-auto h-[calc(100vh-4rem)] flex flex-col relative">
+    <div className="p-4 md:p-6 max-w-[1600px] mx-auto h-[calc(100vh-4rem)] flex flex-col relative overflow-hidden">
 
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-4 flex-shrink-0">
         <div>
           <h1 className="text-2xl font-bold">Standard & Dispatch</h1>
           <p className="text-gray-500 text-sm">Gestion des courses en temps réel</p>
@@ -35,72 +44,103 @@ const DispatcherView = () => {
         </button>
       </div>
 
-      <div className={`flex-1 grid grid-cols-1 ${mapExpanded ? 'lg:grid-cols-1' : 'lg:grid-cols-4'} gap-4 min-h-0`}>
+      <div className={`flex-1 grid grid-cols-1 ${mapExpanded ? 'lg:grid-cols-1' : 'lg:grid-cols-4'} gap-6 min-h-0`}>
 
         {/* Ride Queue (Vertical Stack) */}
         {!mapExpanded && (
-          <div className="lg:col-span-1 flex flex-col space-y-4 overflow-y-auto pb-4 pr-2">
-            {columns.map(col => {
-              const ridesInCol = mockRides.filter(r => r.status === col.id);
-              if (ridesInCol.length === 0) return null;
+          <div className="lg:col-span-1 flex flex-col overflow-hidden h-full">
+            <div className="overflow-y-auto space-y-4 pb-4 pr-2 max-h-full">
+              {columns.map(col => {
+                const ridesInCol = mockRides.filter(r => r.status === col.id);
+                if (ridesInCol.length === 0) return null;
+                const isCollapsed = collapsedColumns[col.id];
 
-              return (
-                <div key={col.id} className={`flex flex-col rounded-xl border ${col.borderColor} bg-white dark:bg-gray-800/50 shadow-sm overflow-hidden`}>
-                  <div className={`p-3 border-b ${col.borderColor} ${col.bgColor} font-bold flex justify-between items-center sticky top-0 z-10 backdrop-blur-sm bg-opacity-90`}>
-                    <span className={col.textColor}>{col.title}</span>
-                    <span className="bg-white/50 dark:bg-black/20 px-2 py-0.5 rounded text-xs">
-                      {ridesInCol.length}
-                    </span>
-                  </div>
+                return (
+                  <div key={col.id} className={`flex flex-col rounded-xl border ${col.borderColor} bg-white dark:bg-gray-800/50 shadow-sm overflow-hidden flex-shrink-0`}>
+                    <div
+                      className={`p-3 border-b ${col.borderColor} ${col.bgColor} font-bold flex justify-between items-center sticky top-0 z-10 backdrop-blur-sm bg-opacity-90 cursor-pointer`}
+                      onClick={(e) => toggleColumn(col.id, e)}
+                    >
+                      <div className="flex items-center space-x-2">
+                        {isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+                        <span className={col.textColor}>{col.title}</span>
+                      </div>
+                      <span className="bg-white/50 dark:bg-black/20 px-2 py-0.5 rounded text-xs">
+                        {ridesInCol.length}
+                      </span>
+                    </div>
 
-                  <div className="p-3 space-y-3">
-                    {ridesInCol.map(ride => {
-                      const driver = getDriver(ride.taxiId);
-                      return (
-                        <div
-                          key={ride.id}
-                          className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow cursor-pointer group"
-                          onClick={() => setSelectedRide(ride)}
-                        >
-                          <div className="flex justify-between items-start mb-2">
-                            <span className="text-xs font-bold text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">{ride.id}</span>
-                            <div className="flex items-center space-x-1 text-xs font-medium text-gray-500">
-                              <Clock className="w-3 h-3" />
-                              <span>{ride.time}</span>
+                    {!isCollapsed && (
+                      <div className="p-3 space-y-3">
+                        {ridesInCol.map(ride => {
+                          const driver = getDriver(ride.taxiId);
+                          return (
+                            <div
+                              key={ride.id}
+                              className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-100 dark:border-gray-700 shadow-sm hover:border-blue-300 dark:hover:border-blue-600 transition-colors cursor-pointer group flex flex-col relative"
+                              onClick={() => setSelectedRide(ride)}
+                            >
+                              <div className="flex justify-between items-start mb-2">
+                                <span className="text-xs font-bold text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">{ride.id}</span>
+                                <div className="flex items-center space-x-2">
+                                  {ride.cpam && <span className="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-1.5 rounded">CPAM</span>}
+                                  <div className="flex items-center space-x-1 text-xs font-medium text-gray-500">
+                                    <Clock className="w-3 h-3" />
+                                    <span>{ride.time}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="flex justify-between items-center mb-1">
+                                <h4 className="font-bold text-sm">{ride.clientName}</h4>
+                                <span className="text-[10px] text-gray-500 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded flex items-center"><Phone className="w-3 h-3 mr-1"/> {ride.phone}</span>
+                              </div>
+
+                              <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1 mb-3">
+                                <div className="flex items-start space-x-1"><div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1 shrink-0"></div><span className="truncate">{ride.pickup}</span></div>
+                                <div className="flex items-start space-x-1"><div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-1 shrink-0"></div><span className="truncate">{ride.dropoff}</span></div>
+                              </div>
+
+                              {driver ? (
+                                <div className="flex justify-between items-center pt-2 border-t dark:border-gray-700">
+                                  <span className="text-xs font-bold bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
+                                    {driver.taxiId} - {driver.name}
+                                  </span>
+                                  <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button className="p-1 text-gray-400 hover:text-blue-600 bg-gray-100 dark:bg-gray-700 rounded" onClick={(e) => { e.stopPropagation(); /* action */ }}><Phone className="w-3 h-3"/></button>
+                                    <button className="p-1 text-gray-400 hover:text-blue-600 bg-gray-100 dark:bg-gray-700 rounded" onClick={(e) => { e.stopPropagation(); /* action */ }}><MessageSquare className="w-3 h-3"/></button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="flex space-x-2 mt-auto">
+                                  <button className="flex-1 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-xs font-bold text-gray-700 dark:text-gray-300 flex items-center justify-center space-x-1">
+                                    <Car className="w-3 h-3"/>
+                                    <span>Assigner</span>
+                                  </button>
+                                </div>
+                              )}
+
+                              {/* Quick actions overlay for Edit/Cancel */}
+                              <div className="absolute top-2 right-2 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button className="p-1 text-gray-400 hover:text-blue-600 bg-white/80 dark:bg-gray-800/80 rounded shadow-sm" onClick={(e) => { e.stopPropagation(); setSelectedRide(ride); }}><Edit className="w-3 h-3"/></button>
+                                {['en_attente', 'client_attend', 'reservation'].includes(ride.status) && (
+                                  <button className="p-1 text-gray-400 hover:text-red-600 bg-white/80 dark:bg-gray-800/80 rounded shadow-sm" onClick={(e) => { e.stopPropagation(); /* cancel */ }}><Trash2 className="w-3 h-3"/></button>
+                                )}
+                              </div>
                             </div>
-                          </div>
-
-                          <h4 className="font-bold text-sm mb-1">{ride.clientName}</h4>
-
-                          <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1 mb-3">
-                            <div className="flex items-start space-x-1"><div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1 shrink-0"></div><span className="truncate">{ride.pickup}</span></div>
-                            <div className="flex items-start space-x-1"><div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-1 shrink-0"></div><span className="truncate">{ride.dropoff}</span></div>
-                          </div>
-
-                          {driver ? (
-                            <div className="flex justify-between items-center pt-2 border-t dark:border-gray-700">
-                              <span className="text-xs font-bold bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
-                                {driver.taxiId} - {driver.name}
-                              </span>
-                              <button className="text-gray-400 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity"><Phone className="w-4 h-4"/></button>
-                            </div>
-                          ) : (
-                            <button className="w-full mt-2 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-xs font-bold text-gray-700 dark:text-gray-300">
-                              Assigner un taxi
-                            </button>
-                          )}
-                        </div>
-                      )
-                    })}
+                          )
+                        })}
+                      </div>
+                    )}
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         )}
 
         {/* Map Placeholder */}
-        <div className={`${mapExpanded ? 'lg:col-span-1 h-full' : 'lg:col-span-3'} bg-gray-200 dark:bg-gray-800 rounded-xl border border-gray-300 dark:border-gray-700 overflow-hidden relative flex flex-col cursor-pointer transition-all duration-300`} onClick={() => !mapExpanded && setMapExpanded(true)}>
+        <div className={`${mapExpanded ? 'lg:col-span-1 h-full' : 'lg:col-span-3'} bg-gray-200 dark:bg-gray-800 rounded-xl border border-gray-300 dark:border-gray-700 overflow-hidden relative flex flex-col cursor-pointer transition-all duration-300 shadow-inner`} onClick={() => !mapExpanded && setMapExpanded(true)}>
           <div className="absolute top-4 left-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur p-2 rounded-lg shadow z-10 flex items-center justify-between text-sm font-medium border border-gray-200 dark:border-gray-700">
             <span>Flotte Active: 42/50</span>
             <div className="flex items-center space-x-3">
