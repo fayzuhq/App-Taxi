@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Activity, Server, Globe, Settings, Users, Key, FileJson, Play, TerminalSquare, X
+  Activity, Server, Globe, Settings, Users, Key, FileJson, Play, TerminalSquare, X, Plus, Save, KeyRound, Map, ShieldCheck, CreditCard, AlertTriangle, Download, Zap
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer
@@ -8,8 +8,12 @@ import {
 import { mockSystemTelemetry, mockTenantSettings, mockGlobalUsers, mockGlobalConfig, mockRawAuditLogs } from '../mockData';
 
 const SuperAdminDashboard = ({ setRole }) => {
+
   const [activeTab, setActiveTab] = useState('health');
   const [selectedLog, setSelectedLog] = useState(null);
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [newUserRole, setNewUserRole] = useState('Chauffeur');
+
 
   const renderHealth = () => (
     <div className="space-y-6">
@@ -92,10 +96,13 @@ const SuperAdminDashboard = ({ setRole }) => {
     </div>
   );
 
-  const renderUsers = () => (
+    const renderUsers = () => (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
       <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center">
         <h3 className="font-bold flex items-center space-x-2"><Users className="w-5 h-5 text-blue-500"/> <span>Global User & Credential Vault</span></h3>
+        <button onClick={() => setIsAddUserModalOpen(true)} className="px-3 py-1.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center space-x-1">
+          <Plus className="w-4 h-4" /> <span>Ajouter un utilisateur</span>
+        </button>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm text-left">
@@ -137,17 +144,264 @@ const SuperAdminDashboard = ({ setRole }) => {
           </tbody>
         </table>
       </div>
+
+      {isAddUserModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-gray-900 rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col my-8">
+            <div className="p-4 border-b dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-gray-800">
+              <h3 className="font-bold">Ajouter un utilisateur (Strict Identity Creation)</h3>
+              <button onClick={() => setIsAddUserModalOpen(false)} className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"><X className="w-5 h-5"/></button>
+            </div>
+            <div className="p-6 space-y-4 overflow-y-auto max-h-[70vh]">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Nom & Prénom *</label>
+                  <input type="text" className="w-full p-2 border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-lg" required />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Numéro de téléphone direct *</label>
+                  <input type="tel" className="w-full p-2 border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-lg" required />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Adresse email *</label>
+                  <input type="email" className="w-full p-2 border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-lg" required />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Référence CNI / Pièce d'identité *</label>
+                  <input type="text" className="w-full p-2 border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-lg" required placeholder="Pour traçabilité" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Rôle assigné *</label>
+                  <select
+                    value={newUserRole}
+                    onChange={(e) => setNewUserRole(e.target.value)}
+                    className="w-full p-2 border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                  >
+                    <option value="Chauffeur">Chauffeur</option>
+                    <option value="Standardiste / Dispatcher">Standardiste / Dispatcher</option>
+                    <option value="Direction / Admin">Direction / Admin</option>
+                    <option value="Super Admin">Super Admin</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Statut *</label>
+                  <select className="w-full p-2 border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <option value="Actif">Actif</option>
+                    <option value="Suspendu">Suspendu</option>
+                    <option value="Archivé">Archivé</option>
+                  </select>
+                </div>
+              </div>
+
+              {newUserRole === 'Chauffeur' && (
+                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg space-y-4 border border-blue-100 dark:border-blue-900/50 mt-4">
+                  <h4 className="font-bold text-sm text-blue-800 dark:text-blue-300">Informations Véhicule & Rattachement</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Numéro de taxi (ex: T14)</label>
+                      <input type="text" className="w-full p-2 border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Modèle du véhicule</label>
+                      <input type="text" className="w-full p-2 border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Plaque d'immatriculation</label>
+                      <input type="text" className="w-full p-2 border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Station de rattachement</label>
+                      <select className="w-full p-2 border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg">
+                        <option>Gare de Grenoble</option>
+                        <option>Presqu'île</option>
+                        <option>CHU</option>
+                        <option>Aucune</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="p-4 border-t dark:border-gray-800 flex justify-end space-x-3 bg-gray-50 dark:bg-gray-800">
+              <button onClick={() => setIsAddUserModalOpen(false)} className="px-4 py-2 font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">Annuler</button>
+              <button onClick={() => setIsAddUserModalOpen(false)} className="px-4 py-2 font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg flex items-center space-x-2">
+                <Save className="w-4 h-4" /> <span>Créer l'identité</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 
-  const renderConfig = () => (
+
+  const renderApis = () => (
+    <div className="space-y-6">
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+        <h3 className="font-bold mb-6 flex items-center space-x-2"><KeyRound className="w-5 h-5 text-indigo-500"/> <span>API Keys & Integrations Management</span></h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* SMS */}
+          <div className="p-4 border dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900/50 space-y-4">
+            <h4 className="font-bold flex items-center space-x-2 text-blue-600"><Server className="w-4 h-4"/> <span>Passerelle SMS</span></h4>
+            <div>
+              <label className="block text-xs font-medium mb-1">Provider</label>
+              <select className="w-full p-2 text-sm border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg">
+                <option>Twilio</option>
+                <option>OVH Telecom</option>
+                <option>MessageBird</option>
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-xs font-medium mb-1">API Key</label>
+                <input type="password" defaultValue="sk_test_12345" className="w-full p-2 text-sm border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg font-mono" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1">Auth Token</label>
+                <input type="password" defaultValue="tok_test_12345" className="w-full p-2 text-sm border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg font-mono" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1">Sender ID</label>
+              <input type="text" defaultValue="TAXI GRENOBLE" className="w-full p-2 text-sm border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg font-mono" />
+            </div>
+            <button className="w-full mt-2 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 hover:bg-blue-200 py-2 rounded-lg text-sm font-medium transition-colors">
+              Tester l'envoi SMS
+            </button>
+          </div>
+
+          {/* Cartographie */}
+          <div className="p-4 border dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900/50 space-y-4">
+            <h4 className="font-bold flex items-center space-x-2 text-green-600"><Map className="w-4 h-4"/> <span>Cartographie & Géocodage</span></h4>
+            <div>
+              <label className="block text-xs font-medium mb-1">Provider</label>
+              <select className="w-full p-2 text-sm border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg">
+                <option>Google Maps API</option>
+                <option>Mapbox</option>
+                <option>OpenStreetMap/Nominatim</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1">API Key</label>
+              <input type="password" defaultValue="AIzaSyA..." className="w-full p-2 text-sm border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg font-mono" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1 flex justify-between">
+                <span>Geofencing Radius (Stations)</span>
+                <span className="text-gray-500">200m</span>
+              </label>
+              <input type="range" min="50" max="1000" defaultValue="200" className="w-full" />
+            </div>
+            <button className="w-full mt-2 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 hover:bg-green-200 py-2 rounded-lg text-sm font-medium transition-colors">
+              Tester la connexion API
+            </button>
+          </div>
+
+          {/* CPAM */}
+          <div className="p-4 border dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900/50 space-y-4">
+            <h4 className="font-bold flex items-center space-x-2 text-purple-600"><ShieldCheck className="w-4 h-4"/> <span>Télétransmission CPAM</span></h4>
+            <div>
+              <label className="block text-xs font-medium mb-1">Endpoint URL</label>
+              <input type="text" defaultValue="https://ws.ameli.fr/teletrans" className="w-full p-2 text-sm border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg font-mono" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1">Partner Certificate / Key</label>
+              <textarea rows="2" defaultValue="-----BEGIN CERTIFICATE-----
+MIIDXT..." className="w-full p-2 text-sm border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg font-mono text-xs"></textarea>
+            </div>
+            <button className="w-full mt-2 bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 hover:bg-purple-200 py-2 rounded-lg text-sm font-medium transition-colors">
+              Ping Status
+            </button>
+          </div>
+
+          {/* Paiement */}
+          <div className="p-4 border dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900/50 space-y-4">
+            <h4 className="font-bold flex items-center space-x-2 text-orange-600"><CreditCard className="w-4 h-4"/> <span>Passerelle de Paiement</span></h4>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-xs font-medium mb-1">Public Key</label>
+                <input type="text" defaultValue="pk_test_123" className="w-full p-2 text-sm border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg font-mono" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium mb-1">Secret Key</label>
+                <input type="password" defaultValue="sk_test_123" className="w-full p-2 text-sm border dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg font-mono" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1">Active Webhook URL</label>
+              <input type="text" defaultValue="https://api.taxis-grenoble.fr/stripe/webhook" disabled className="w-full p-2 text-sm border dark:border-gray-700 bg-gray-100 dark:bg-gray-800 rounded-lg font-mono text-gray-500" />
+            </div>
+            <button className="w-full mt-2 bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300 hover:bg-orange-200 py-2 rounded-lg text-sm font-medium transition-colors">
+              Vérifier Webhooks
+            </button>
+          </div>
+
+        </div>
+
+        <div className="mt-6 flex justify-end">
+          <button className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg flex items-center space-x-2">
+            <Save className="w-4 h-4" /> <span>Sauvegarder les clés</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+    const renderConfig = () => (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 max-w-2xl">
-      <h3 className="font-bold mb-6 flex items-center space-x-2"><Globe className="w-5 h-5 text-indigo-500"/> <span>Global Configuration & Toggles</span></h3>
+      <h3 className="font-bold mb-6 flex items-center space-x-2"><Globe className="w-5 h-5 text-indigo-500"/> <span>Global Configuration & Feature Flags</span></h3>
 
       <div className="space-y-6">
+        <h4 className="font-semibold text-gray-700 dark:text-gray-300 border-b dark:border-gray-700 pb-2">Expérience Client & Communication</h4>
+
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-medium">Scanner de documents CPAM</p>
+            <p className="font-medium">SMS d'approche automatique</p>
+            <p className="text-xs text-gray-500">Envoie un SMS 5 min avant l'arrivée du chauffeur.</p>
+          </div>
+          <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-blue-600" />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium">Lien de suivi GPS en direct</p>
+            <p className="text-xs text-gray-500">Envoie un SMS au client avec la position GPS du taxi.</p>
+          </div>
+          <input type="checkbox" defaultChecked={mockGlobalConfig.liveSmsTracking} className="w-5 h-5 rounded text-blue-600" />
+        </div>
+
+        <h4 className="font-semibold text-gray-700 dark:text-gray-300 border-b dark:border-gray-700 pb-2 mt-6">Dispatch & Logistique</h4>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium">Auto-dispatch géolocalisé</p>
+            <p className="text-xs text-gray-500">Privilégier le dispatch géo-localisé par rapport à l'attribution manuelle.</p>
+          </div>
+          <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-blue-600" />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium">Gestion de file d'attente virtuelle aux stations</p>
+            <p className="text-xs text-gray-500">Gare de Grenoble, Presqu'île.</p>
+          </div>
+          <input type="checkbox" defaultChecked={mockGlobalConfig.autoGeofencingStations} className="w-5 h-5 rounded text-blue-600" />
+        </div>
+
+        <h4 className="font-semibold text-gray-700 dark:text-gray-300 border-b dark:border-gray-700 pb-2 mt-6">Opérations & Administratif</h4>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium">Scanner et validation automatique des ordonnances CPAM</p>
             <p className="text-xs text-gray-500">Active la fonctionnalité OCR pour les chauffeurs.</p>
           </div>
           <input type="checkbox" defaultChecked={mockGlobalConfig.enableCpamScanner} className="w-5 h-5 rounded text-blue-600" />
@@ -155,33 +409,92 @@ const SuperAdminDashboard = ({ setRole }) => {
 
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-medium">Auto-Geofencing des gares/stations</p>
-            <p className="text-xs text-gray-500">Gare de Grenoble, Presqu'île.</p>
+            <p className="font-medium">Mode conduite simplifié pour l'application chauffeur</p>
+            <p className="text-xs text-gray-500">Interface épurée pendant la conduite.</p>
           </div>
-          <input type="checkbox" defaultChecked={mockGlobalConfig.autoGeofencingStations} className="w-5 h-5 rounded text-blue-600" />
+          <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-blue-600" />
         </div>
 
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-medium">Lien de suivi SMS en direct</p>
-            <p className="text-xs text-gray-500">Envoie un SMS au client avec la position GPS du taxi.</p>
+            <p className="font-medium">Export comptable automatique journalier (PDF / CSV)</p>
+            <p className="text-xs text-gray-500">Génération et envoi automatique en fin de journée.</p>
           </div>
-          <input type="checkbox" defaultChecked={mockGlobalConfig.liveSmsTracking} className="w-5 h-5 rounded text-blue-600" />
+          <input type="checkbox" defaultChecked className="w-5 h-5 rounded text-blue-600" />
         </div>
 
-        <div className="pt-4 border-t dark:border-gray-700">
-          <label className="block text-sm font-medium mb-1">Webhook SMS Gateway</label>
-          <div className="flex space-x-2">
-            <input type="text" defaultValue={mockGlobalConfig.smsWebhookUrl} className="flex-1 p-2 border dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-lg font-mono text-sm" />
-            <button className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-medium px-4 py-2 rounded-lg text-sm">
-              Test ping
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
 
+    const renderGovernance = () => (
+    <div className="space-y-6 max-w-4xl">
+
+      {/* Maintenance Mode */}
+      <div className="bg-red-50 dark:bg-red-900/10 p-6 rounded-xl border border-red-200 dark:border-red-900/50">
+        <div className="flex items-start justify-between">
+          <div className="flex items-start space-x-3">
+            <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-500 mt-1" />
+            <div>
+              <h3 className="font-bold text-red-800 dark:text-red-400 text-lg">Mode Maintenance</h3>
+              <p className="text-sm text-red-600 dark:text-red-500/80 mt-1">Suspend l'accès à l'application pour les chauffeurs et standardistes. Seuls les administrateurs peuvent se connecter.</p>
+
+              <div className="mt-4 space-y-2">
+                <label className="block text-sm font-medium text-red-800 dark:text-red-400">Bannière d'annonce (visible par tous)</label>
+                <textarea
+                  rows="2"
+                  defaultValue="🛠️ Opération de maintenance en cours. L'application sera de nouveau disponible d'ici 30 minutes. Merci de votre patience."
+                  className="w-full p-3 text-sm border-red-300 dark:border-red-800 bg-white dark:bg-gray-900 rounded-lg text-gray-800 dark:text-gray-200"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label className="relative inline-flex items-center cursor-pointer mt-2">
+              <input type="checkbox" className="sr-only peer" />
+              <div className="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-red-600"></div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {/* Diagnostics & Demo */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        {/* Export JSON */}
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+          <h3 className="font-bold mb-2 flex items-center space-x-2"><Download className="w-5 h-5 text-blue-500"/> <span>Sauvegarde et Audit State</span></h3>
+          <p className="text-sm text-gray-500 mb-6">Télécharger une archive JSON complète de l'état actuel (Mock State) pour l'analyse locale.</p>
+
+          <button onClick={() => {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ mockSystemTelemetry, mockTenantSettings, mockGlobalUsers, mockGlobalConfig, mockRawAuditLogs }, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href",     dataStr);
+            downloadAnchorNode.setAttribute("download", "taxi-grenoble-state-export.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+          }} className="w-full flex items-center justify-center space-x-2 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 py-3 rounded-lg font-bold transition-colors">
+            <FileJson className="w-5 h-5" />
+            <span>Export Sauvegarde complète</span>
+          </button>
+        </div>
+
+        {/* Sandbox Demo */}
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+          <h3 className="font-bold mb-2 flex items-center space-x-2"><Zap className="w-5 h-5 text-yellow-500"/> <span>Générateur de Démo</span></h3>
+          <p className="text-sm text-gray-500 mb-6">Peuple instantanément la base de données avec des courses, des chauffeurs et des clients fictifs pour les présentations.</p>
+
+          <button className="w-full flex items-center justify-center space-x-2 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-500 hover:bg-yellow-100 dark:hover:bg-yellow-900/40 py-3 rounded-lg font-bold transition-colors border border-yellow-200 dark:border-yellow-900/50">
+            <Play className="w-5 h-5" />
+            <span>Générer flotte de test (Sandbox)</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  );
   const renderAudit = () => (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col max-h-[80vh]">
       <div className="p-4 border-b dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-900/50">
@@ -259,11 +572,17 @@ const SuperAdminDashboard = ({ setRole }) => {
         <button onClick={() => setActiveTab('users')} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2 ${activeTab === 'users' ? 'bg-white dark:bg-gray-700 shadow text-purple-600 dark:text-purple-400' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
           <Users className="w-4 h-4"/> <span className="whitespace-nowrap">User Vault</span>
         </button>
+        <button onClick={() => setActiveTab('apis')} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2 ${activeTab === 'apis' ? 'bg-white dark:bg-gray-700 shadow text-purple-600 dark:text-purple-400' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+          <KeyRound className="w-4 h-4"/> <span className="whitespace-nowrap">API & Secrets</span>
+        </button>
         <button onClick={() => setActiveTab('config')} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2 ${activeTab === 'config' ? 'bg-white dark:bg-gray-700 shadow text-purple-600 dark:text-purple-400' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
           <Globe className="w-4 h-4"/> <span className="whitespace-nowrap">Global Config</span>
         </button>
-        <button onClick={() => setActiveTab('audit')} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2 ${activeTab === 'audit' ? 'bg-white dark:bg-gray-700 shadow text-purple-600 dark:text-purple-400' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+                <button onClick={() => setActiveTab('audit')} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2 ${activeTab === 'audit' ? 'bg-white dark:bg-gray-700 shadow text-purple-600 dark:text-purple-400' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
           <TerminalSquare className="w-4 h-4"/> <span className="whitespace-nowrap">Dev Audit Logs</span>
+        </button>
+        <button onClick={() => setActiveTab('governance')} className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-2 ${activeTab === 'governance' ? 'bg-white dark:bg-gray-700 shadow text-purple-600 dark:text-purple-400' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+          <AlertTriangle className="w-4 h-4"/> <span className="whitespace-nowrap">System Governance</span>
         </button>
       </div>
 
@@ -272,8 +591,10 @@ const SuperAdminDashboard = ({ setRole }) => {
         {activeTab === 'health' && renderHealth()}
         {activeTab === 'tenant' && renderTenant()}
         {activeTab === 'users' && renderUsers()}
+        {activeTab === 'apis' && renderApis()}
         {activeTab === 'config' && renderConfig()}
         {activeTab === 'audit' && renderAudit()}
+        {activeTab === 'governance' && renderGovernance()}
       </div>
     </div>
   );
